@@ -1,7 +1,9 @@
 package server
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -81,6 +83,71 @@ func (s *Server) evioServe() error {
 		}
 
 		log.Debugf("Opened connection: %s", client.remoteAddr)
+
+		return
+	}
+
+	// fires when the server receives new data from a connection.
+	events.Data = func(econn evio.Conn, in []byte) (out []byte, action evio.Action) {
+		// load the client
+		client := econn.Context().(*Client)
+
+		// read the payload from the client input stream.
+		packet := client.in.Begin(in)
+
+		// load the pipeline reader
+		pr := &client.pr
+		rdbuf := bytes.NewBuffer(packet)
+		pr.rd = rdbuf
+
+		msgs, err := pr.ReadMessages()
+		if err != nil {
+			log.Error(err)
+			action = evio.Close
+			return
+		}
+		for _, msg := range msgs {
+			if msg != nil && msg.Command() != "" {
+				if msg.Command() == "quit" {
+					io.WriteString(client, "+OK\r\n")
+					action = evio.Close
+					break
+				}
+
+				// increment last used
+				client.mu.Lock()
+				client.last = time.Now()
+				client.mu.Unlock()
+
+				// log incomming
+				log.Debugf("Handles command %+v:%s", msg, msg.Command())
+
+				// handle the command
+				/*
+					err := server.handleInputCommand(client, msg)
+					if err != nil {
+						if err.Error() == goingLive {
+							client.goLiveErr = err
+							client.goLiveMsg = msg
+							action = evio.Detach
+							return
+						}
+						log.Error(err)
+						action = evio.Close
+						return
+					}
+				*/
+			} else {
+				action = evio.Close
+				break
+			}
+		}
+
+		packet = packet[len(packet)-rdbuf.Len():]
+		client.in.End(packet)
+
+		out = client.out
+		client.out = nil
 
 		return
 	}
