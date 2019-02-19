@@ -9,6 +9,7 @@ require (
 	github.com/spf13/viper v1.3.1
 	github.com/tidwall/evio v1.0.2
 	github.com/tidwall/redcon v0.9.0
+	github.com/tidwall/resp v0.0.0-20160908231031-b2b1a7ca20e3
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4 // indirect
 )
