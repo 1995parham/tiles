@@ -11,8 +11,6 @@ import (
 	"github.com/tidwall/resp"
 )
 
-var errInvalidNumberOfArguments = errors.New("invalid number of arguments")
-
 func isRespValueEmptyString(val resp.Value) bool {
 	return !val.IsNull() && (val.Type() == resp.SimpleString || val.Type() == resp.BulkString) && len(val.Bytes()) == 0
 }
@@ -120,6 +118,8 @@ func (s *Server) command(msg *Message, client *Client) (res resp.Value, err erro
 	switch msg.Command() {
 	default:
 		err = fmt.Errorf("unknown command '%s'", msg.Args[0])
+	case "set":
+		res, err = s.cmdSet(msg)
 	}
 	return
 }
