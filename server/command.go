@@ -73,7 +73,7 @@ func (s *Server) handleInputCommand(client *Client, msg *Message) error {
 	}
 
 	// Command. Just send back the ok response to have a simple redis cli.
-	if msg.Command() == "ping" || msg.Command() == "echo" {
+	if msg.Command() == "command" {
 		switch msg.OutputType {
 		case RESP:
 			return writeOutput("+OK\r\n")
