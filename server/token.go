@@ -1,5 +1,14 @@
 package server
 
+// isReservedFielName checks the given field name agains reserved keywords.
+func isReservedFieldName(field string) bool {
+	switch field {
+	case "z", "lat", "lon":
+		return true
+	}
+	return false
+}
+
 func token(line string) (newLine, token string) {
 	for i := 0; i < len(line); i++ {
 		if line[i] == ' ' {
