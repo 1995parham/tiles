@@ -12,6 +12,8 @@ import (
 
 // Config holds all configurations of application
 type Config struct {
+	Debug bool
+
 	Threads int
 	Host    string
 	Port    int
