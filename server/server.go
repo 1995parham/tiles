@@ -2,8 +2,10 @@ package server
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/labstack/gommon/log"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/tidwall/evio"
 )
 
@@ -12,6 +14,10 @@ type Server struct {
 	Threads int
 	Host    string
 	Port    int
+
+	Config struct {
+		KeepAlive time.Duration
+	}
 }
 
 // New creates new server instance
@@ -37,6 +43,7 @@ func (s *Server) evioServe() error {
 	}
 	events.LoadBalance = evio.LeastConnections
 
+	// fires when the server is ready to accept new connections
 	events.Serving = func(eserver evio.Server) (action evio.Action) {
 		if eserver.NumLoops == 1 {
 			log.Infof("Running single-threaded")
@@ -47,6 +54,25 @@ func (s *Server) evioServe() error {
 			log.Infof("Ready to accept connections at %s",
 				addr)
 		}
+		return
+	}
+
+	// fires when a connection has opened
+	events.Opened = func(econn evio.Conn) (out []byte, opts evio.Options, action evio.Action) {
+		client := new(Client)
+		client.opened = time.Now()
+		client.remoteAddr = econn.RemoteAddr().String()
+
+		// keep track of the client
+		econn.SetContext(client)
+
+		// set the client keep-alive, if needed
+		if s.Config.KeepAlive > 0 {
+			opts.TCPKeepAlive = time.Duration(s.Config.KeepAlive)
+		}
+
+		log.Debugf("Opened connection: %s", client.remoteAddr)
+
 		return
 	}
 
