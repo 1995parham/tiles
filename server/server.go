@@ -108,6 +108,7 @@ func (s *Server) evioServe() error {
 		}
 		for _, msg := range msgs {
 			if msg != nil && msg.Command() != "" {
+				// handles quit command here to close connection.
 				if msg.Command() == "quit" {
 					io.WriteString(client, "+OK\r\n")
 					action = evio.Close
@@ -119,24 +120,16 @@ func (s *Server) evioServe() error {
 				client.last = time.Now()
 				client.mu.Unlock()
 
-				// log incomming
+				// log incomming command
 				log.Debugf("Handles command %+v:%s", msg, msg.Command())
 
 				// handle the command
-				/*
-					err := server.handleInputCommand(client, msg)
-					if err != nil {
-						if err.Error() == goingLive {
-							client.goLiveErr = err
-							client.goLiveMsg = msg
-							action = evio.Detach
-							return
-						}
-						log.Error(err)
-						action = evio.Close
-						return
-					}
-				*/
+				err := s.handleInputCommand(client, msg)
+				if err != nil {
+					log.Errorf("Command Execution Error: %s", err)
+					action = evio.Close
+					return
+				}
 			} else {
 				action = evio.Close
 				break
