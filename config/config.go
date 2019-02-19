@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -14,9 +15,10 @@ import (
 type Config struct {
 	Debug bool
 
-	Threads int
-	Host    string
-	Port    int
+	Threads   int
+	Host      string
+	Port      int
+	KeepAlive time.Duration
 }
 
 var instance Config
