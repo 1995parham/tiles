@@ -57,6 +57,15 @@ func (s *Server) evioServe() error {
 		return
 	}
 
+	// fires when a connection has closed.
+	events.Closed = func(econn evio.Conn, err error) (action evio.Action) {
+		// load the client
+		client := econn.Context().(*Client)
+
+		log.Debugf("Closed connection: %s", client.remoteAddr)
+		return
+	}
+
 	// fires when a connection has opened
 	events.Opened = func(econn evio.Conn) (out []byte, opts evio.Options, action evio.Action) {
 		client := new(Client)
