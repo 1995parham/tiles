@@ -207,7 +207,7 @@ func (server *Server) cmdSet(msg *Message) (resp.Value, error) {
 		return resp.NullValue(), err
 	}
 
-	fmt.Println(d)
+	fmt.Println(geohash.Encode(d.Center().X, d.Center().Y))
 
 	switch msg.OutputType {
 	default:
