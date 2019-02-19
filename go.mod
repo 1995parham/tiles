@@ -5,6 +5,7 @@ require (
 	github.com/labstack/gommon v0.2.8
 	github.com/mattn/go-colorable v0.1.0 // indirect
 	github.com/mattn/go-isatty v0.0.4 // indirect
+	github.com/sirupsen/logrus v1.3.0
 	github.com/spf13/viper v1.3.1
 	github.com/tidwall/evio v1.0.2
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
