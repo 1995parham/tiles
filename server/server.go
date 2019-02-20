@@ -6,6 +6,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/go-redis/redis"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/tidwall/evio"
@@ -20,6 +21,8 @@ type Server struct {
 	Config struct {
 		KeepAlive time.Duration
 	}
+
+	nodes map[string]*redis.Client
 }
 
 // New creates new server instance
@@ -34,6 +37,11 @@ func New(threads int, host string, port int) *Server {
 // Run runs the server with event loop
 func (s *Server) Run() error {
 	return s.evioServe()
+}
+
+// AddNode adds new destination node and its hash
+func (s *Server) AddNode(hash string, opts *redis.Options) {
+	s.nodes[hash] = redis.NewClient(opts)
 }
 
 func (s *Server) evioServe() error {
