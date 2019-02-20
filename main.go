@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"github.com/sirupsen/logrus"
-	"github.com/snapp-cab/tiles/config"
-	"github.com/snapp-cab/tiles/server"
+	"gitlab.snapp.ir/golangify/tiles/config"
+	"gitlab.snapp.ir/golangify/tiles/server"
 )
 
 func main() {

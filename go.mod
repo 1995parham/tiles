@@ -1,4 +1,4 @@
-module github.com/snapp-cab/tiles
+module gitlab.snapp.ir/golangify/tiles
 
 require (
 	github.com/armon/go-radix v1.0.0
