@@ -23,4 +23,9 @@ func main() {
 	}
 	// loads server extra configuration
 	s.Config.KeepAlive = config.GetConfig().KeepAlive
+
+	// setup the shard!
+	for hash, opts := range config.GetConfig().Tiles {
+		s.AddNode(hash, &opts)
+	}
 }
