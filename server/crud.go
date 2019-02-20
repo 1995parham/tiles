@@ -6,7 +6,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-redis/redis"
 	"github.com/mmcloughlin/geohash"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/geojson"
 	"github.com/tidwall/geojson/geometry"
 	"github.com/tidwall/resp"
@@ -14,7 +16,7 @@ import (
 
 // parseSetArgs parses arguments of SET command. it extracts all sections of the command but only
 // returns its location part.
-func (server *Server) parseSetArgs(vs []string) (obj geojson.Object, err error) {
+func (s *Server) parseSetArgs(vs []string) (obj geojson.Object, err error) {
 	// these variables only store SET command section for the prasing
 	var fields []string
 	var values []float64
@@ -197,17 +199,33 @@ func (server *Server) parseSetArgs(vs []string) (obj geojson.Object, err error) 
 	return
 }
 
-func (server *Server) cmdSet(msg *Message) (resp.Value, error) {
+func (s *Server) cmdSet(msg *Message) (resp.Value, error) {
 	// let's calculate the elapsed time
 	start := time.Now()
 
 	vs := msg.Args[1:]
-	d, err := server.parseSetArgs(vs)
+	d, err := s.parseSetArgs(vs)
 	if err != nil {
 		return resp.NullValue(), err
 	}
 
-	fmt.Println(geohash.Encode(d.Center().X, d.Center().Y))
+	// passes the current command into selected shard
+	ca := make([]interface{}, len(msg.Args))
+	for i, arg := range msg.Args {
+		ca[i] = arg
+	}
+	cmd := redis.NewStringCmd(ca...)
+
+	gh := geohash.Encode(d.Center().Y, d.Center().X)
+	// longest prefix matching with radix tree
+	m, c, ok := s.nodes.LongestPrefix(gh)
+	if !ok {
+		return resp.NullValue(), fmt.Errorf("there is no shard available for geohash: %s", gh)
+	}
+	log.Debugf("Geohash %s is matched with %s", gh, m)
+	if err := c.(*redis.Client).Process(cmd); err != nil {
+		return resp.NullValue(), err
+	}
 
 	switch msg.OutputType {
 	default:
@@ -215,14 +233,6 @@ func (server *Server) cmdSet(msg *Message) (resp.Value, error) {
 		return resp.StringValue(`{"ok":true,"elapsed":"` + time.Now().Sub(start).String() + "\"}"), nil
 	case RESP:
 		return resp.SimpleStringValue("OK"), nil
-	}
-
-	switch msg.OutputType {
-	default:
-	case JSON:
-		return resp.NullValue(), nil
-	case RESP:
-		return resp.NullValue(), nil
 	}
 
 	return resp.NullValue(), nil

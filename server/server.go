@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
+	radix "github.com/armon/go-radix"
 	"github.com/go-redis/redis"
 	log "github.com/sirupsen/logrus"
 
@@ -22,7 +24,8 @@ type Server struct {
 		KeepAlive time.Duration
 	}
 
-	nodes map[string]*redis.Client
+	mu    sync.Mutex  // guard
+	nodes *radix.Tree // maps hashes to *redis.Client
 }
 
 // New creates new server instance
@@ -31,6 +34,8 @@ func New(threads int, host string, port int) *Server {
 		Threads: threads,
 		Host:    host,
 		Port:    port,
+
+		nodes: radix.New(),
 	}
 }
 
@@ -41,7 +46,9 @@ func (s *Server) Run() error {
 
 // AddNode adds new destination node and its hash
 func (s *Server) AddNode(hash string, opts *redis.Options) {
-	s.nodes[hash] = redis.NewClient(opts)
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.nodes.Insert(hash, redis.NewClient(opts))
 }
 
 func (s *Server) evioServe() error {
