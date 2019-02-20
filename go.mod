@@ -1,6 +1,7 @@
 module github.com/snapp-cab/tiles
 
 require (
+	github.com/go-redis/redis v6.15.1+incompatible
 	github.com/kavu/go_reuseport v1.4.0 // indirect
 	github.com/labstack/gommon v0.2.8
 	github.com/mattn/go-colorable v0.1.0 // indirect
