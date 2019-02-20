@@ -18,14 +18,16 @@ func main() {
 
 	// creates a server
 	s := server.New(config.GetConfig().Threads, config.GetConfig().Host, config.GetConfig().Port)
-	if err := s.Run(); err != nil {
-		log.Fatal(err)
-	}
+
 	// loads server extra configuration
 	s.Config.KeepAlive = config.GetConfig().KeepAlive
 
 	// setup the shard!
 	for hash, opts := range config.GetConfig().Tiles {
 		s.AddNode(hash, &opts)
+	}
+
+	if err := s.Run(); err != nil {
+		log.Fatal(err)
 	}
 }
