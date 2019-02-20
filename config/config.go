@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-redis/redis"
 	"github.com/spf13/viper"
 )
 
@@ -19,6 +20,8 @@ type Config struct {
 	Host      string
 	Port      int
 	KeepAlive time.Duration
+
+	Tiles map[string]redis.Options
 }
 
 var instance Config
