@@ -20,7 +20,6 @@ func (s *Server) parseSetArgs(vs []string) (obj geojson.Object, err error) {
 	// these variables only store SET command section for the prasing
 	var fields []string
 	var values []float64
-	var xx, nx bool
 	var expires *float64
 
 	var ok bool
@@ -92,22 +91,12 @@ func (s *Server) parseSetArgs(vs []string) (obj geojson.Object, err error) {
 			continue
 		}
 		if lcb(arg, "xx") {
-			vs = nvs
-			if nx {
-				err = errInvalidArgument(string(arg))
-				return
-			}
-			xx = true
-			continue
+			err = errors.New("tiles does not support xx field")
+			return
 		}
 		if lcb(arg, "nx") {
-			vs = nvs
-			if xx {
-				err = errInvalidArgument(string(arg))
-				return
-			}
-			nx = true
-			continue
+			err = errors.New("tiles does not support nx field")
+			return
 		}
 		break
 	}
