@@ -120,6 +120,8 @@ func (s *Server) command(msg *Message, client *Client) (res resp.Value, err erro
 		err = fmt.Errorf("unknown command '%s'", msg.Args[0])
 	case "set":
 		res, err = s.cmdSet(msg)
+	case "scan":
+		res, err = s.cmdScan(msg)
 	}
 	return
 }
