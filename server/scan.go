@@ -33,6 +33,8 @@ func (s *Server) cmdScan(msg *Message) (resp.Value, error) {
 			return true
 		}
 
+		log.Debugf("scan response from %s: %v", s, res)
+
 		if len(res) == 2 {
 			for _, obj := range res[1].([]interface{}) {
 				objs = append(objs, resp.AnyValue(obj))
