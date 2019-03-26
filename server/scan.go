@@ -7,18 +7,31 @@ import (
 )
 
 func (s *Server) cmdScan(msg *Message) (resp.Value, error) {
-	// result collection with the following forma
-	results := make([]resp.Value, 0)
-
-	// aggregated objects (scan * OBJECTS)
+	// aggregated objects
 	objs := make([]resp.Value, 0)
 
-	// passes the current command into selected shard
+	// aggregated count
+	var count int64
+
+	// passes the given command into selected shard
+	// based on output format only two case can happen, if
+	// output format is COUNT result is a single integer otherwise
+	// result will be array.
+	// https://github.com/tidwall/tile38/blob/master/internal/server/scanner.go
+	isOutputCount := false
 	ca := make([]interface{}, len(msg.Args))
 	for i, arg := range msg.Args {
+		if arg == "COUNT" {
+			isOutputCount = true
+		}
 		ca[i] = arg
 	}
-	cmd := redis.NewSliceCmd(ca...)
+	var cmd redis.Cmder
+	if !isOutputCount {
+		cmd = redis.NewSliceCmd(ca...)
+	} else {
+		cmd = redis.NewIntCmd(ca...)
+	}
 
 	s.nodes.Walk(func(s string, v interface{}) bool {
 		log.Debugf("scan request for %s", s)
@@ -27,24 +40,33 @@ func (s *Server) cmdScan(msg *Message) (resp.Value, error) {
 			return true
 		}
 
-		res, err := cmd.Result()
-		if err != nil {
+		if err := cmd.Err(); err != nil {
 			log.Errorf("scan command error on %s: %s", s, err)
 			return true
 		}
 
-		log.Debugf("scan response from %s: %v", s, res)
+		if !isOutputCount {
+			res := cmd.(*redis.SliceCmd).Val()
+			log.Debugf("scan response from %s: %v", s, res)
 
-		if len(res) == 2 {
 			for _, obj := range res[1].([]interface{}) {
 				objs = append(objs, resp.AnyValue(obj))
 			}
+		} else {
+			res := cmd.(*redis.IntCmd).Val()
+			log.Debugf("scan response from %s: %v", s, res)
+
+			count += res
 		}
 
 		return false
 	})
 
-	results = append(results, resp.IntegerValue(len(objs)))
-	results = append(results, resp.ArrayValue(objs))
-	return resp.ArrayValue(results), nil
+	if !isOutputCount {
+		results := make([]resp.Value, 0)
+		results = append(results, resp.IntegerValue(len(objs)))
+		results = append(results, resp.ArrayValue(objs))
+		return resp.ArrayValue(results), nil
+	}
+	return resp.IntegerValue(int(count)), nil
 }
