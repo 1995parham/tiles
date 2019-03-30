@@ -29,6 +29,7 @@ func tokenvalbytes(vs []string) (nvs []string, token []byte, ok bool) {
 	return
 }
 
+// compares the given byte arrays vs the given string
 func lcb(s1 []byte, s2 string) bool {
 	if len(s1) != len(s2) {
 		return false
