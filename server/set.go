@@ -18,8 +18,6 @@ import (
 // returns its location part.
 func (s *Server) parseSetArgs(vs []string) (obj geojson.Object, err error) {
 	// these variables only store SET command section for the prasing
-	var fields []string
-	var values []float64
 	var expires *float64
 
 	var ok bool
@@ -46,9 +44,10 @@ func (s *Server) parseSetArgs(vs []string) (obj geojson.Object, err error) {
 		}
 		if lcb(arg, "field") {
 			vs = nvs
+
 			var name string
-			var svalue string
-			var value float64
+			var value string
+
 			if vs, name, ok = tokenval(vs); !ok || name == "" {
 				err = errInvalidNumberOfArguments
 				return
@@ -57,17 +56,10 @@ func (s *Server) parseSetArgs(vs []string) (obj geojson.Object, err error) {
 				err = errInvalidArgument(name)
 				return
 			}
-			if vs, svalue, ok = tokenval(vs); !ok || svalue == "" {
+			if vs, value, ok = tokenval(vs); !ok || value == "" {
 				err = errInvalidNumberOfArguments
 				return
 			}
-			value, err = strconv.ParseFloat(svalue, 64)
-			if err != nil {
-				err = errInvalidArgument(svalue)
-				return
-			}
-			fields = append(fields, name)
-			values = append(values, value)
 			continue
 		}
 		if lcb(arg, "ex") {
