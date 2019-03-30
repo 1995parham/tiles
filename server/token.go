@@ -1,6 +1,6 @@
 package server
 
-// isReservedFielName checks the given field name agains reserved keywords.
+// isReservedFielName checks the given field name against reserved keywords.
 func isReservedFieldName(field string) bool {
 	switch field {
 	case "z", "lat", "lon":
