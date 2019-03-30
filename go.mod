@@ -12,7 +12,7 @@ require (
 	github.com/sirupsen/logrus v1.3.0
 	github.com/spf13/afero v1.2.0 // indirect
 	github.com/spf13/viper v1.3.1
-	github.com/stretchr/testify v1.3.0 // indirect
+	github.com/stretchr/testify v1.3.0
 	github.com/tidwall/boxtree v0.0.0-20180928224827-327de8d774d7 // indirect
 	github.com/tidwall/evio v1.0.2
 	github.com/tidwall/geojson v1.1.1
