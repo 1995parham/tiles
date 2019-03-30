@@ -46,5 +46,13 @@ func TestClient(t *testing.T) {
 	assert.NoError(t, client.Process(sccmd))
 	c, err := sccmd.Result()
 	assert.NoError(t, err)
-	assert.Equal(t, 3, c)
+	assert.Equal(t, int64(3), c)
+
+	// WITHIN
+	wcmd := redis.NewIntCmd("WITHIN", "fleet", "BOUNDS", "35.7023983", "51.4081489", "35.7027219", "51.4079793")
+	assert.NoError(t, client.Process(wcmd))
+	w, err := wcmd.Result()
+	assert.NoError(t, err)
+	assert.Equal(t, int64(1), w)
+
 }
