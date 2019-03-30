@@ -72,8 +72,7 @@ func (s *Server) handleInputCommand(client io.Writer, msg *Message) error {
 
 	// Command. Just send back the ok response to have a simple redis cli.
 	if msg.Command() == "command" {
-		switch msg.OutputType {
-		case RESP:
+		if msg.OutputType == RESP {
 			return writeOutput("+OK\r\n")
 		}
 		return nil
