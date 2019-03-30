@@ -22,7 +22,7 @@ COPY . /src
 # Put built binaries and runtime resources in /app dir ready to be copied over or used.
 RUN CGO_ENABLED=0 go install -ldflags="-w -s" && \
     mkdir -p /app && \
-    cp -r "$GOPATH/bin/doago" /app/
+    cp -r "$GOPATH/bin/tiles" /app/
 
 #
 # 2. Runtime Container
