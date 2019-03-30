@@ -48,6 +48,7 @@ WORKDIR /app
 # expose default port of the application
 EXPOSE 1372
 
+RUN touch /app/shards.yaml
 COPY --from=build /app /app/
 
 CMD ["./tiles"]
