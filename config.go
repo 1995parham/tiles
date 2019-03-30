@@ -29,9 +29,9 @@ func shards() Shards {
 	}
 
 	if err := v.UnmarshalExact(&instance); err != nil {
-		logrus.Errorf("configuration: %s", err)
+		logrus.Errorf("shards unmarshaling: %s", err)
 	}
-	fmt.Printf("Following configuration is loaded:\n%+v\n", instance)
+	fmt.Printf("Following shards are loaded:\n%+v\n", instance)
 
 	return instance
 }
@@ -84,7 +84,7 @@ keepAlive: 0s
 	v.AutomaticEnv()
 
 	if err := v.UnmarshalExact(&instance); err != nil {
-		logrus.Errorf("configuration: %s", err)
+		logrus.Errorf("shards unmarshaling: %s", err)
 	}
 	fmt.Printf("Following configuration is loaded:\n%+v\n", instance)
 
