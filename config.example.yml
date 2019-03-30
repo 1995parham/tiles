@@ -5,3 +5,5 @@ threads: 0
 tiles:
   tn:
     addr: 127.0.0.1:9851
+  tnke9w:
+    addr: 127.0.0.1:9852
