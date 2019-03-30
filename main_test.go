@@ -49,7 +49,7 @@ func TestClient(t *testing.T) {
 	assert.Equal(t, int64(3), c)
 
 	// WITHIN
-	wcmd := redis.NewIntCmd("WITHIN", "fleet", "BOUNDS", "35.7023983", "51.4081489", "35.7027219", "51.4079793")
+	wcmd := redis.NewIntCmd("WITHIN", "fleet", "BOUNDS", "35.7023983", "51.4081489", "35.7027219", "51.4079793", "COUNT")
 	assert.NoError(t, client.Process(wcmd))
 	w, err := wcmd.Result()
 	assert.NoError(t, err)
