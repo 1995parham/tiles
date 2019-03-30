@@ -20,12 +20,12 @@ func (s *Server) cmdGet(msg *Message) (resp.Value, error) {
 	var shardErr error
 
 	s.nodes.Walk(func(s string, v interface{}) bool {
-		log.Debugf("scan request for %s", s)
+		log.Debugf("get request for %s", s)
 		if err := v.(*redis.Client).Process(cmd); err != nil {
 			if err == redis.Nil {
 				return false
 			}
-			log.Errorf("scan command error on %s: %s", s, err)
+			log.Errorf("get command error on %s: %s", s, err)
 			shardErr = err
 			return true
 		}
@@ -34,13 +34,13 @@ func (s *Server) cmdGet(msg *Message) (resp.Value, error) {
 			if err == redis.Nil {
 				return false
 			}
-			log.Errorf("scan command error on %s: %s", s, err)
+			log.Errorf("get command error on %s: %s", s, err)
 			shardErr = err
 			return true
 		}
 
 		res := cmd.Val()
-		log.Debugf("scan response from %s: %v", s, res)
+		log.Debugf("get response from %s: %v", s, res)
 
 		for _, obj := range res {
 			objs = append(objs, resp.AnyValue(obj))
