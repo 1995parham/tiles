@@ -125,6 +125,8 @@ func (s *Server) command(msg *Message) (res resp.Value, err error) {
 	case "within":
 		// within is the same as scan for sharding. These requests are handled in each shard later.
 		res, err = s.cmdScan(msg)
+	case "get":
+		res, err = s.cmdGet(msg)
 	}
 	return
 }
