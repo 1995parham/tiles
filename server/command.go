@@ -57,7 +57,8 @@ func (s *Server) handleInputCommand(client io.Writer, msg *Message) error {
 		switch msg.OutputType {
 		case JSON:
 			if len(msg.Args) > 1 {
-				return writeOutput(`{"ok":true,"` + msg.Command() + `":` + jsonString(msg.Args[1]) + `,"elapsed":"` + time.Now().Sub(start).String() + `"}`)
+				return writeOutput(`{"ok":true,"` + msg.Command() +
+					`":` + jsonString(msg.Args[1]) + `,"elapsed":"` + time.Since(start).String() + `"}`)
 			}
 			return writeOutput(`{"ok":true,"` + msg.Command() + `":"pong","elapsed":"` + time.Since(start).String() + `"}`)
 		case RESP:
@@ -81,7 +82,7 @@ func (s *Server) handleInputCommand(client io.Writer, msg *Message) error {
 	writeErr := func(errMsg string) error {
 		switch msg.OutputType {
 		case JSON:
-			return writeOutput(`{"ok":false,"err":` + jsonString(errMsg) + `,"elapsed":"` + time.Now().Sub(start).String() + "\"}")
+			return writeOutput(`{"ok":false,"err":` + jsonString(errMsg) + `,"elapsed":"` + time.Since(start).String() + "\"}")
 		case RESP:
 			if errMsg == errInvalidNumberOfArguments.Error() {
 				return writeOutput("-ERR wrong number of arguments for '" + msg.Command() + "' command\r\n")
