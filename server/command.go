@@ -15,7 +15,7 @@ func isRespValueEmptyString(val resp.Value) bool {
 	return !val.IsNull() && (val.Type() == resp.SimpleString || val.Type() == resp.BulkString) && len(val.Bytes()) == 0
 }
 
-func (s *Server) handleInputCommand(client *Client, msg *Message) error {
+func (s *Server) handleInputCommand(client io.Writer, msg *Message) error {
 	start := time.Now()
 
 	serializeOutput := func(res resp.Value) (string, error) {
@@ -59,7 +59,7 @@ func (s *Server) handleInputCommand(client *Client, msg *Message) error {
 			if len(msg.Args) > 1 {
 				return writeOutput(`{"ok":true,"` + msg.Command() + `":` + jsonString(msg.Args[1]) + `,"elapsed":"` + time.Now().Sub(start).String() + `"}`)
 			}
-			return writeOutput(`{"ok":true,"` + msg.Command() + `":"pong","elapsed":"` + time.Now().Sub(start).String() + `"}`)
+			return writeOutput(`{"ok":true,"` + msg.Command() + `":"pong","elapsed":"` + time.Since(start).String() + `"}`)
 		case RESP:
 			if len(msg.Args) > 1 {
 				data := redcon.AppendBulkString(nil, msg.Args[1])
@@ -93,7 +93,7 @@ func (s *Server) handleInputCommand(client *Client, msg *Message) error {
 		return nil
 	}
 
-	res, err := s.command(msg, client)
+	res, err := s.command(msg)
 	if res.Type() == resp.Error {
 		return writeErr(res.String())
 	}
@@ -114,13 +114,16 @@ func (s *Server) handleInputCommand(client *Client, msg *Message) error {
 	return nil
 }
 
-func (s *Server) command(msg *Message, client *Client) (res resp.Value, err error) {
+func (s *Server) command(msg *Message) (res resp.Value, err error) {
 	switch msg.Command() {
 	default:
 		err = fmt.Errorf("unknown command '%s'", msg.Args[0])
 	case "set":
 		res, err = s.cmdSet(msg)
 	case "scan":
+		res, err = s.cmdScan(msg)
+	case "within":
+		// within is the same as scan for sharding. These requests are handled in each shard later.
 		res, err = s.cmdScan(msg)
 	}
 	return
