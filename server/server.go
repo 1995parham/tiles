@@ -94,7 +94,7 @@ func (s *Server) evioServe() error {
 
 		// set the client keep-alive, if needed
 		if s.Config.KeepAlive > 0 {
-			opts.TCPKeepAlive = time.Duration(s.Config.KeepAlive)
+			opts.TCPKeepAlive = s.Config.KeepAlive
 		}
 
 		log.Debugf("Opened connection: %s", client.remoteAddr)
