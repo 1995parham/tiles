@@ -18,7 +18,7 @@ test:
   variables:
     GOPROXY: http://172.16.77.197:3000
   script:
-    - mv .ci/config.yml config.yml
+    - mv .ci/config.ci.yml config.yml
     - go test ./...
   coverage: '/^total:\t+\(statements\)\t+(\d+\.\d+)%/'
   services:
