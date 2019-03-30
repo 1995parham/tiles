@@ -5,25 +5,28 @@ import (
 	"log"
 
 	"github.com/sirupsen/logrus"
-	"gitlab.snapp.ir/golangify/tiles/config"
 	"gitlab.snapp.ir/golangify/tiles/server"
 )
 
 func main() {
 	fmt.Println("18.20 at Sep 07 2016 7:20 IR721")
 
-	if config.GetConfig().Debug {
+	// loads configuration
+	cfg := config()
+
+	// sets log level
+	if cfg.Debug {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 
 	// creates a server
-	s := server.New(config.GetConfig().Threads, config.GetConfig().Host, config.GetConfig().Port)
+	s := server.New(cfg.Threads, cfg.Host, cfg.Port)
 
 	// loads server extra configuration
-	s.Config.KeepAlive = config.GetConfig().KeepAlive
+	s.Config.KeepAlive = cfg.KeepAlive
 
-	// setup the shard!
-	for hash, opts := range config.GetConfig().Tiles {
+	// setup the shards!
+	for hash, opts := range cfg.Tiles {
 		s.AddNode(hash, &opts)
 	}
 
