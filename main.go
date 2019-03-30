@@ -26,7 +26,8 @@ func main() {
 	s.Config.KeepAlive = cfg.KeepAlive
 
 	// setup the shards!
-	for hash, opts := range cfg.Tiles {
+	for hash := range cfg.Tiles {
+		opts := cfg.Tiles[hash]
 		s.AddNode(hash, &opts)
 	}
 
