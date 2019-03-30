@@ -1,0 +1,29 @@
+stages:
+  - lint
+  - test
+
+lint:
+  image: golangci/golangci-lint:latest
+  stage: lint
+  variables:
+    GOPROXY: http://172.16.77.197:3000
+    GOOS: 'linux'
+    GOARCH: 'amd64'
+  script:
+    - go mod download
+    - golangci-lint run --enable-all
+
+test:
+  image: golang:latest
+  stage: test
+  variables:
+    GOPROXY: http://172.16.77.197:3000
+  script:
+    - mv .ci/config.yml config.yml
+    - go test ./...
+  coverage: '/^total:\t+\(statements\)\t+(\d+\.\d+)%/'
+  services:
+    - name: tile38/tile38
+      alias: tile38_1
+    - name: tile38/tile38
+      alias: tile38_2
