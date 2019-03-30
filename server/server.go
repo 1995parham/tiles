@@ -125,7 +125,9 @@ func (s *Server) evioServe() error {
 			if msg != nil && msg.Command() != "" {
 				// handles quit command here to close connection.
 				if msg.Command() == "quit" {
-					io.WriteString(client, "+OK\r\n")
+					if _, err := io.WriteString(client, "+OK\r\n"); err != nil {
+						log.Errorf("Quit Error: %s", err)
+					}
 					action = evio.Close
 					break
 				}
