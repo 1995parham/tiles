@@ -39,12 +39,12 @@ func TestClient(t *testing.T) {
 	))
 	cmds, err := pipe.Exec()
 	assert.NoError(t, err)
-	assert.Equal(t, 2, cmds)
+	assert.Equal(t, 2, len(cmds))
 
 	// SCAN
 	sccmd := redis.NewIntCmd("SCAN", "fleet", "COUNT")
 	assert.NoError(t, client.Process(sccmd))
-	c, err := scmd.Result()
+	c, err := sccmd.Result()
 	assert.NoError(t, err)
 	assert.Equal(t, 3, c)
 }
