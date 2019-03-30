@@ -1,10 +1,9 @@
 stages:
-  - lint
-  - test
+  - lint-test
 
 lint:
   image: golangci/golangci-lint:latest
-  stage: lint
+  stage: lint-test
   variables:
     GOPROXY: http://172.16.77.197:3000
     GOOS: 'linux'
@@ -15,7 +14,7 @@ lint:
 
 test:
   image: golang:latest
-  stage: test
+  stage: lint-test
   variables:
     GOPROXY: http://172.16.77.197:3000
   script:
