@@ -9,7 +9,7 @@ import (
 
 // Client is a remote connection into Tiles
 type Client struct {
-	id         int              // unique id
+	id         int64            // unique id
 	remoteAddr string           // original remote address
 	in         evio.InputStream // input stream
 	pr         PipelineReader   // command reader

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	radix "github.com/armon/go-radix"
@@ -84,9 +85,11 @@ func (s *Server) evioServe() error {
 	}
 
 	// fires when a connection has opened
+	var clientID int64 // track number of connected clients
 	events.Opened = func(econn evio.Conn) (out []byte, opts evio.Options, action evio.Action) {
 		client := new(Client)
 		client.opened = time.Now()
+		client.id = atomic.AddInt64(&clientID, 1)
 		client.remoteAddr = econn.RemoteAddr().String()
 
 		// keep track of the client
