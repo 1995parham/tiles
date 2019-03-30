@@ -33,15 +33,19 @@ func (s *Server) cmdScan(msg *Message) (resp.Value, error) {
 		cmd = redis.NewIntCmd(ca...)
 	}
 
+	var shardErr error
+
 	s.nodes.Walk(func(s string, v interface{}) bool {
 		log.Debugf("scan request for %s", s)
 		if err := v.(*redis.Client).Process(cmd); err != nil {
 			log.Errorf("scan command error on %s: %s", s, err)
+			shardErr = err
 			return true
 		}
 
 		if err := cmd.Err(); err != nil {
 			log.Errorf("scan command error on %s: %s", s, err)
+			shardErr = err
 			return true
 		}
 
@@ -66,7 +70,7 @@ func (s *Server) cmdScan(msg *Message) (resp.Value, error) {
 		results := make([]resp.Value, 0)
 		results = append(results, resp.IntegerValue(len(objs)))
 		results = append(results, resp.ArrayValue(objs))
-		return resp.ArrayValue(results), nil
+		return resp.ArrayValue(results), shardErr
 	}
-	return resp.IntegerValue(int(count)), nil
+	return resp.IntegerValue(int(count)), shardErr
 }
