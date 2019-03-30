@@ -219,7 +219,7 @@ func (s *Server) cmdSet(msg *Message) (resp.Value, error) {
 	switch msg.OutputType {
 	default:
 	case JSON:
-		return resp.StringValue(`{"ok":true,"elapsed":"` + time.Now().Sub(start).String() + "\"}"), nil
+		return resp.StringValue(`{"ok":true,"elapsed":"` + time.Since(start).String() + "\"}"), nil
 	case RESP:
 		return resp.SimpleStringValue("OK"), nil
 	}
