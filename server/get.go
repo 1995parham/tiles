@@ -6,16 +6,26 @@ import (
 	"github.com/tidwall/resp"
 )
 
+func respAnyValueWithArray(obj interface{}) resp.Value {
+	if objs, ok := obj.([]interface{}); ok {
+		var ress []resp.Value
+		for _, obj := range objs {
+			ress = append(ress, respAnyValueWithArray(obj))
+		}
+		return resp.ArrayValue(ress)
+	}
+	return resp.AnyValue(obj)
+}
+
 func (s *Server) cmdGet(msg *Message) (resp.Value, error) {
-	// aggregated objects
-	objs := make([]resp.Value, 0)
+	var obj interface{}
 
 	ca := make([]interface{}, len(msg.Args))
 	for i, arg := range msg.Args {
 		ca[i] = arg
 	}
 
-	cmd := redis.NewSliceCmd(ca...)
+	cmd := redis.NewCmd(ca...)
 
 	var shardErr error
 
@@ -39,15 +49,11 @@ func (s *Server) cmdGet(msg *Message) (resp.Value, error) {
 			return true
 		}
 
-		res := cmd.Val()
-		log.Debugf("get response from %s: %v", s, res)
-
-		for _, obj := range res {
-			objs = append(objs, resp.AnyValue(obj))
-		}
+		obj = cmd.Val()
+		log.Debugf("get response from %s: %v", s, obj)
 
 		return true
 	})
 
-	return resp.ArrayValue(objs), shardErr
+	return respAnyValueWithArray(obj), shardErr
 }
