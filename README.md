@@ -9,4 +9,5 @@ It shards write requests using geohash and acts like a proxy so clients can conn
 - SET
 - SCAN
 - WITHIN
+- GET (only returns the first result)
 - PIPELINE (This is a client feature not a tile feature!)
