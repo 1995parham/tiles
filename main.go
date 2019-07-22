@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/1995parham/tiles/server"
 	"github.com/sirupsen/logrus"
-	"gitlab.snapp.ir/golangify/tiles/server"
 )
 
 func main() {
