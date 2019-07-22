@@ -1,4 +1,4 @@
-module gitlab.snapp.ir/golangify/tiles
+module github.com/1995parham/tiles
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
