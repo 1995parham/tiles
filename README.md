@@ -1,4 +1,5 @@
 # Tiles
+[![Drone (cloud)](https://img.shields.io/drone/build/1995parham/tiles.svg?style=flat-square)](https://cloud.drone.io/1995parham/tiles)
 
 ## Introduction
 Tiles is a solution for [tile38](https://github.com/tidwall/tile38) sharding.
