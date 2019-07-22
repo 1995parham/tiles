@@ -1,0 +1,22 @@
+kind: pipeline
+name: default
+
+steps:
+  - name: lint
+    image: golang
+    commands:
+      - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.16.0
+      - golangci-lint run --enable-all
+  - name: test
+    image: golang
+    commands:
+      - go build
+      - mv .ci/config.ci.yml config.yml
+      - mv .ci/shards.ci.yml shards.yml
+      - go test -v ./...
+
+services:
+  - name: tile38_1
+    image: tile38/tile38
+  - name: tile38_2
+    image: tile38/tile38
