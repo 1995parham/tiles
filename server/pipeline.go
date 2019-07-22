@@ -62,7 +62,7 @@ moreData:
 	} else if len(rd.buf) > 0 {
 		rd.buf = rd.buf[:0]
 	}
-	if err != nil && len(msgs) == 0 {
+	if len(msgs) == 0 {
 		return nil, err
 	}
 	return msgs, nil
